@@ -9,19 +9,14 @@ import (
 
 func main() {
 	conn, err := net.Dial("tcp", ":8000")
-	if err != nil {
-		log.Fatal(err)
-	}
+	errorCheck(err)
 
 	go func() {
 		data := make([]byte, 4096)
 
 		for {
 			n, err := conn.Read(data)
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
+			errorCheck(err)
 
 			log.Println("Server send: " + string(data[:n]))
 			time.Sleep(time.Duration(3) * time.Second)
@@ -33,5 +28,11 @@ func main() {
 		fmt.Scanln(&s)
 		conn.Write([]byte(s))
 		time.Sleep(time.Duration(3) * time.Second)
+	}
+}
+
+func errorCheck(err error) {
+	if err != nil {
+		log.Fatal(err)
 	}
 }

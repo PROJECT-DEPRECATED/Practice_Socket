@@ -12,25 +12,21 @@ func main() {
 
 func TCPSocket() {
 	l, err := net.Listen("tcp", ":8000")
-	if err != nil {
-		log.Fatal(err)
-	}
+	errorCheck(err)
 	defer l.Close()
 
 	for {
 		conn, err := l.Accept()
-		if err != nil {
-			log.Fatal(err)
-			continue
-		}
-
+		errorCheck(err)
 		defer conn.Close()
+
 		go ConnHandler(conn)
 	}
 }
 
 func ConnHandler(conn net.Conn) {
 	recvBuffer := make([]byte, 4096)
+
 	for {
 		n, err := conn.Read(recvBuffer)
 		if err != nil {
@@ -47,10 +43,13 @@ func ConnHandler(conn net.Conn) {
 			data := recvBuffer[:n]
 			log.Println(string(data))
 			_, err = conn.Write(data[:n])
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
+			errorCheck(err)
 		}
+	}
+}
+
+func errorCheck(err error) {
+	if err != nil {
+		log.Fatal(err)
 	}
 }
